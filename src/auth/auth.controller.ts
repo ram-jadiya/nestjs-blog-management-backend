@@ -16,12 +16,14 @@ import { SignUpDto } from './dto/sign-up.dto';
 import { SignInDto } from './dto/sign-in.dto';
 import * as bcrypt from 'bcrypt';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiCookieAuth,
   ApiOperation,
   ApiResponse,
 } from '@nestjs/swagger';
 import { TokenResponseDto } from './dto/token-response.dto';
+import { Public } from './decorators/public.decorator';
 
 /**
  * Authentication Controller.
@@ -42,6 +44,7 @@ export class AuthController {
    * @param {SignUpDto} signUpDto - User registration data.
    * @returns {Promise<any>} Newly created user object.
    */
+  @Public()
   @Post('signup')
   @ApiOperation({ summary: 'Register new user' })
   @ApiResponse({
@@ -68,6 +71,7 @@ export class AuthController {
    * @param {Response} res - Express response object.
    * @returns {Promise<TokenResponseDto>} Access and refresh tokens.
    */
+  @Public()
   @Post('signin')
   @ApiOperation({ summary: 'Authenticate user' })
   @ApiResponse({
@@ -113,7 +117,10 @@ export class AuthController {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    return { access_token: accessToken, refresh_token: refreshToken };
+    return {
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    };
   }
 
   /**
@@ -124,6 +131,7 @@ export class AuthController {
    * @returns {Promise<string>} New access token.
    * @throws {UnauthorizedException} If the refresh token is invalid or expired.
    */
+  @Public()
   @Post('refresh')
   @ApiOperation({ summary: 'Refresh access token' })
   @ApiResponse({
@@ -174,6 +182,7 @@ export class AuthController {
    * @returns {Promise<{ message: string }>} Success message.
    */
   @Post('logout')
+  @ApiBearerAuth('JWT-auth')
   @ApiOperation({ summary: 'Logout user' })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -186,7 +195,7 @@ export class AuthController {
   async logout(
     @Res({ passthrough: true }) res: Response,
     @Body('email') email: string,
-  ) {
+  ): Promise<{ message: string }> {
     await this.usersService.removeRefreshToken(email);
     res.clearCookie('refresh_token');
     return { message: 'Logged out successfully' };

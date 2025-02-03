@@ -5,6 +5,7 @@ import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import authConfig from './config/auth.config';
+import { AuthGuard } from './guards/auth.guard';
 
 @Module({
   imports: [
@@ -21,7 +22,14 @@ import authConfig from './config/auth.config';
     }),
     ConfigModule.forFeature(authConfig),
   ],
-  providers: [AuthService],
+  providers: [
+    AuthService,
+    {
+      provide: 'APP_GUARD',
+      useClass: AuthGuard,
+    },
+  ],
   controllers: [AuthController],
+  exports: [JwtModule],
 })
 export class AuthModule {}

@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { ConfigService } from '@nestjs/config';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { JwtService } from '@nestjs/jwt';
 
 /**
  * Bootstrap function to initialize the NestJS application.
@@ -16,19 +18,29 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const configService = app.get(ConfigService);
+  const reflector = app.get(Reflector);
+
+  // Register global guard with reflector
+  app.useGlobalGuards(new AuthGuard(app.get(JwtService), reflector));
 
   /**
    * Swagger API documentation configuration.
    */
   const config = new DocumentBuilder()
-    .setTitle('Blog Demo API')
-    .setDescription('Blog Demo API')
+    .setTitle('Blog API')
+    .setDescription('Blog management system API')
     .setVersion('1.0')
-    .addCookieAuth('refresh_token', {
-      type: 'http',
-      in: 'header',
-      scheme: 'Bearer',
-    })
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Enter JWT token',
+        in: 'header',
+      },
+      'JWT-auth', // This name should match the Security decorator name
+    )
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
