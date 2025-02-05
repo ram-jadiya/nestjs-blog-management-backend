@@ -7,11 +7,16 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { BlogsModule } from './blogs/blogs.module';
 import { BlogCategoriesModule } from './blog-categories/blog-categories.module';
+import { R2Service } from './r2/r2.service';
+import { UploadController } from './upload/upload.controller';
+import configuration from './auth/config/configuration';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: '.env.local',
+      isGlobal: true,
+      load: [configuration],
     }),
     DatabaseModule,
     UsersModule,
@@ -19,7 +24,7 @@ import { BlogCategoriesModule } from './blog-categories/blog-categories.module';
     BlogCategoriesModule,
     BlogsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [AppController, UploadController],
+  providers: [AppService, R2Service],
 })
 export class AppModule {}
