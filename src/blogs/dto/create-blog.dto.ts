@@ -51,6 +51,11 @@ export class CreateBlogDto {
   @IsNotEmpty()
   authorId: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  domainId: string;
+
   @ApiProperty({ required: false, default: false })
   isFeatured?: boolean;
 }

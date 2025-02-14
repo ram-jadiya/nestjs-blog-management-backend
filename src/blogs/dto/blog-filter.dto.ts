@@ -29,4 +29,9 @@ export class BlogFilterDto extends PaginationDto {
   @IsBooleanString()
   @IsOptional()
   isFeatured?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  domainUrl?: string;
 }
