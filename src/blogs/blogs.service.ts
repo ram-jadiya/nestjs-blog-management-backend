@@ -38,7 +38,8 @@ export class BlogsService {
   async create(createDto: CreateBlogDto): Promise<Blog> {
     return this.blogModel.create({
       ...createDto,
-      blogCategoryId: new Types.ObjectId(createDto.blogCategoryId),
+      blogCategory: new Types.ObjectId(createDto.blogCategoryId),
+      author: new Types.ObjectId(createDto.authorId),
     });
   }
 
@@ -75,6 +76,8 @@ export class BlogsService {
     const [data, count] = await Promise.all([
       this.blogModel
         .find(conditions)
+        .populate('blogCategory', '-__v -createdAt -updatedAt -isActive')
+        .populate('author', '-__v -createdAt -updatedAt -isActive')
         .skip((filter.pageIndex - 1) * filter.pageSize)
         .limit(filter.pageSize)
         .exec(),
@@ -91,7 +94,11 @@ export class BlogsService {
    * @returns {Promise<Blog | null>} - The Blog document, or null if not found.
    */
   async findOne(id: string): Promise<Blog | null> {
-    return this.blogModel.findById(id).exec();
+    return this.blogModel
+      .findById(id)
+      .populate('blogCategory', '-__v -createdAt -updatedAt -isActive')
+      .populate('author', '-__v -createdAt -updatedAt -isActive')
+      .exec();
   }
 
   /**
@@ -108,7 +115,10 @@ export class BlogsService {
         {
           ...updateDto,
           ...(updateDto.blogCategoryId && {
-            blogCategoryId: new Types.ObjectId(updateDto.blogCategoryId),
+            blogCategory: new Types.ObjectId(updateDto.blogCategoryId),
+          }),
+          ...(updateDto.authorId && {
+            author: new Types.ObjectId(updateDto.authorId),
           }),
         },
         { new: true },

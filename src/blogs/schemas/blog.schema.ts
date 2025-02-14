@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { BlogCategory } from '../../blog-categories/schemas/blog-category.schema';
+import { Author } from 'src/authors/schemas/author.schema';
 
 /**
  * Mongoose schema for the Blog model.
@@ -34,7 +35,10 @@ export class Blog extends Document {
   tags: string[];
 
   @Prop({ type: Types.ObjectId, ref: BlogCategory.name, required: true })
-  blogCategoryId: Types.ObjectId;
+  blogCategory: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: Author.name, required: true })
+  author: Types.ObjectId;
 
   @Prop({ default: false })
   isFeatured: boolean;
