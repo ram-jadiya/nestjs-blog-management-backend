@@ -86,6 +86,42 @@ export class BlogsController {
   }
 
   /**
+   * Retrieves a lightweight list of blog posts for lookup purposes.
+   * Excludes content and tags fields for better performance.
+   *
+   * This endpoint is public and does not require authentication.
+   *
+   * @param pagination The pagination parameters (pageIndex, pageSize).
+   * @param blogCategoryId (Optional) The category ID to filter the blogs.
+   * @param keyword (Optional) The keyword to search for in the blog title.
+   * @param isActive (Optional) The active status of the blogs.
+   * @param isFeatured (Optional) The featured status of the blogs.
+   * @returns A list of blog posts with limited fields matching the filters and pagination details.
+   */
+  @Public()
+  @Get('lookups')
+  @ApiOperation({ summary: 'Get blog lookups with limited fields' })
+  @ApiQuery({ name: 'blogCategoryId', required: false })
+  @ApiQuery({ name: 'keyword', required: false })
+  @ApiQuery({ name: 'isActive', required: false })
+  @ApiQuery({ name: 'isFeatured', required: false })
+  getLookups(
+    @Query() pagination: PaginationDto,
+    @Query('blogCategoryId') blogCategoryId?: string,
+    @Query('keyword') keyword?: string,
+    @Query('isActive') isActive?: string,
+    @Query('isFeatured') isFeatured?: string,
+  ) {
+    return this.service.findLookupsWithFilters({
+      blogCategoryId,
+      keyword,
+      isActive,
+      isFeatured,
+      ...pagination,
+    });
+  }
+
+  /**
    * Retrieves a single blog post by its ID.
    *
    * This endpoint is public and does not require authentication.
