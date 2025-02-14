@@ -10,6 +10,7 @@ import { BlogCategoriesModule } from './blog-categories/blog-categories.module';
 import { R2Service } from './r2/r2.service';
 import { UploadController } from './upload/upload.controller';
 import configuration from './auth/config/configuration';
+import { AuthorsModule } from './authors/authors.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import configuration from './auth/config/configuration';
     DatabaseModule,
     UsersModule,
     AuthModule,
+    AuthorsModule,
     BlogCategoriesModule,
     BlogsModule,
   ],
