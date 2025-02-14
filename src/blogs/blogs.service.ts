@@ -40,6 +40,7 @@ export class BlogsService {
       ...createDto,
       blogCategory: new Types.ObjectId(createDto.blogCategoryId),
       author: new Types.ObjectId(createDto.authorId),
+      domain: new Types.ObjectId(createDto.domainId),
     });
 
     return blog._id as string;
@@ -75,11 +76,25 @@ export class BlogsService {
       conditions.isFeatured = filter.isFeatured === 'true';
     }
 
+    // Fetch domain ID based on domainUrl if provided
+    if (filter.domainUrl) {
+      const domain = await this.blogModel.db
+        .collection('domains')
+        .findOne({ url: filter.domainUrl });
+
+      if (domain) {
+        conditions['domain'] = new Types.ObjectId(domain._id);
+      } else {
+        return { data: [], count: 0 }; // No blogs found for the given domain
+      }
+    }
+
     const [data, count] = await Promise.all([
       this.blogModel
         .find(conditions)
         .populate('blogCategory', '-__v -createdAt -updatedAt -isActive')
         .populate('author', '-__v -createdAt -updatedAt -isActive')
+        .populate('domain', '-__v -createdAt -updatedAt -isActive')
         .skip((filter.pageIndex - 1) * filter.pageSize)
         .limit(filter.pageSize)
         .exec(),
@@ -120,10 +135,25 @@ export class BlogsService {
       conditions.isFeatured = filter.isFeatured === 'true';
     }
 
+    // Fetch domain ID based on domainUrl if provided
+    if (filter.domainUrl) {
+      const domain = await this.blogModel.db
+        .collection('domains')
+        .findOne({ url: filter.domainUrl });
+
+      if (domain) {
+        conditions['domain'] = new Types.ObjectId(domain._id);
+      } else {
+        return { data: [], count: 0 }; // No blogs found for the given domain
+      }
+    }
+
     const [data, count] = await Promise.all([
       this.blogModel
         .find(conditions)
-        .select('-content -tags -author -isActive -createdAt -updatedAt -__v')
+        .select(
+          '-content -tags -author -domain -isActive -createdAt -updatedAt -__v',
+        )
         .populate('blogCategory', '-__v -createdAt -updatedAt -isActive')
         .skip((filter.pageIndex - 1) * filter.pageSize)
         .limit(filter.pageSize)
@@ -145,6 +175,7 @@ export class BlogsService {
       .findById(id)
       .populate('blogCategory', '-__v -createdAt -updatedAt -isActive')
       .populate('author', '-__v -createdAt -updatedAt -isActive')
+      .populate('domain', '-__v -createdAt -updatedAt -isActive')
       .exec();
   }
 
@@ -166,6 +197,9 @@ export class BlogsService {
           }),
           ...(updateDto.authorId && {
             author: new Types.ObjectId(updateDto.authorId),
+          }),
+          ...(updateDto.domainId && {
+            domain: new Types.ObjectId(updateDto.authorId),
           }),
         },
         { new: true },

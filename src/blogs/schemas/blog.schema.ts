@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 import { BlogCategory } from '../../blog-categories/schemas/blog-category.schema';
 import { Author } from 'src/authors/schemas/author.schema';
+import { Domain } from 'src/domains/schemas/domain.schema';
 
 /**
  * Mongoose schema for the Blog model.
@@ -39,6 +40,9 @@ export class Blog extends Document {
 
   @Prop({ type: Types.ObjectId, ref: Author.name, required: true })
   author: Types.ObjectId;
+
+  @Prop({ type: Types.ObjectId, ref: Domain.name, required: true })
+  domain: Types.ObjectId;
 
   @Prop({ default: false })
   isFeatured: boolean;

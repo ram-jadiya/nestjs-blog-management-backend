@@ -11,6 +11,7 @@ import { R2Service } from './r2/r2.service';
 import { UploadController } from './upload/upload.controller';
 import configuration from './auth/config/configuration';
 import { AuthorsModule } from './authors/authors.module';
+import { DomainsModule } from './domains/domains.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AuthorsModule } from './authors/authors.module';
     UsersModule,
     AuthModule,
     AuthorsModule,
+    DomainsModule,
     BlogCategoriesModule,
     BlogsModule,
   ],

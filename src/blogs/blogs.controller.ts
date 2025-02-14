@@ -56,6 +56,7 @@ export class BlogsController {
    * This endpoint is public and does not require authentication.
    *
    * @param pagination The pagination parameters (pageIndex, pageSize).
+   * @param domainUrl (Optional) The domain URL to filter the blogs by domain.
    * @param blogCategoryId (Optional) The category ID to filter the blogs.
    * @param keyword (Optional) The keyword to search for in the blog title or content.
    * @param isActive (Optional) The active status of the blogs.
@@ -65,12 +66,14 @@ export class BlogsController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all blog posts with filters' })
+  @ApiQuery({ name: 'domainUrl', required: false })
   @ApiQuery({ name: 'blogCategoryId', required: false })
   @ApiQuery({ name: 'keyword', required: false })
   @ApiQuery({ name: 'isActive', required: false })
   @ApiQuery({ name: 'isFeatured', required: false })
   findAll(
     @Query() pagination: PaginationDto,
+    @Query('domainUrl') domainUrl?: string,
     @Query('blogCategoryId') blogCategoryId?: string,
     @Query('keyword') keyword?: string,
     @Query('isActive') isActive?: string,
@@ -81,6 +84,7 @@ export class BlogsController {
       keyword,
       isActive,
       isFeatured,
+      domainUrl,
       ...pagination,
     });
   }
@@ -92,6 +96,7 @@ export class BlogsController {
    * This endpoint is public and does not require authentication.
    *
    * @param pagination The pagination parameters (pageIndex, pageSize).
+   * @param domainUrl (Optional) The domain URL to filter the blogs by domain.
    * @param blogCategoryId (Optional) The category ID to filter the blogs.
    * @param keyword (Optional) The keyword to search for in the blog title.
    * @param isActive (Optional) The active status of the blogs.
@@ -101,12 +106,14 @@ export class BlogsController {
   @Public()
   @Get('lookups')
   @ApiOperation({ summary: 'Get blog lookups with limited fields' })
+  @ApiQuery({ name: 'domainUrl', required: false })
   @ApiQuery({ name: 'blogCategoryId', required: false })
   @ApiQuery({ name: 'keyword', required: false })
   @ApiQuery({ name: 'isActive', required: false })
   @ApiQuery({ name: 'isFeatured', required: false })
   getLookups(
     @Query() pagination: PaginationDto,
+    @Query('domainUrl') domainUrl?: string,
     @Query('blogCategoryId') blogCategoryId?: string,
     @Query('keyword') keyword?: string,
     @Query('isActive') isActive?: string,
@@ -117,6 +124,7 @@ export class BlogsController {
       keyword,
       isActive,
       isFeatured,
+      domainUrl,
       ...pagination,
     });
   }
