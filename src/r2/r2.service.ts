@@ -10,8 +10,10 @@ export class R2Service {
   constructor(private configService: ConfigService) {
     this.s3 = new S3({
       endpoint: this.configService.get<string>('r2.endpoint'),
-      accessKeyId: this.configService.get<string>('r2.accessKey'),
-      secretAccessKey: this.configService.get<string>('r2.secretKey'),
+      credentials: {
+        accessKeyId: this.configService.get<string>('r2.accessKey') ?? '',
+        secretAccessKey: this.configService.get<string>('r2.secretKey') ?? '',
+      },
       signatureVersion: 'v4',
     });
   }
