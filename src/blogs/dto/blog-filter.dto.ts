@@ -3,7 +3,7 @@ import { IsBooleanString, IsOptional, IsString } from 'class-validator';
 import { PaginationDto } from '../../shared/interfaces/pagination.dto';
 
 /**
- * DTO for filtering blog categories with pagination support.
+ * DTO for filtering blog with pagination support.
  *
  * This class extends the `PaginationDto` and adds additional optional filters
  * such as `blogCategoryId`, `keyword`, `isActive`, and `isFeatured` for querying blog categories.

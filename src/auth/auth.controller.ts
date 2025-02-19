@@ -118,7 +118,7 @@ export class AuthController {
     });
 
     return {
-      access_token: accessToken,
+      access_token: accessToken.access_token,
       refresh_token: refreshToken,
     };
   }

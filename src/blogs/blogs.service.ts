@@ -151,10 +151,9 @@ export class BlogsService {
     const [data, count] = await Promise.all([
       this.blogModel
         .find(conditions)
-        .select(
-          '-content -tags -author -domain -isActive -createdAt -updatedAt -__v',
-        )
+        .select('-content -tags -author -isActive -createdAt -updatedAt -__v')
         .populate('blogCategory', '-__v -createdAt -updatedAt -isActive')
+        .populate('domain', '-__v -createdAt -updatedAt -isActive')
         .skip((filter.pageIndex - 1) * filter.pageSize)
         .limit(filter.pageSize)
         .exec(),

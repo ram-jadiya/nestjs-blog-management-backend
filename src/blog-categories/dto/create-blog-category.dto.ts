@@ -14,6 +14,11 @@ export class CreateBlogCategoryDto {
   @IsNotEmpty()
   name: string;
 
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  domainId: string;
+
   @ApiProperty({ required: false, default: true })
   isActive?: boolean;
 }

@@ -1,5 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
+import { Domain } from 'src/domains/schemas/domain.schema';
 
 /**
  * Represents a blog category in the database.
@@ -14,6 +15,9 @@ import { Document } from 'mongoose';
 export class BlogCategory extends Document {
   @Prop({ required: true, unique: true })
   name: string;
+
+  @Prop({ type: Types.ObjectId, ref: Domain.name, required: true })
+  domain: Types.ObjectId;
 
   @Prop({ default: true })
   isActive: boolean;

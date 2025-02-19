@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { BlogCategory } from './schemas/blog-category.schema';
-import { PaginationDto } from '../shared/interfaces/pagination.dto';
 import { CreateBlogCategoryDto } from './dto/create-blog-category.dto';
 import { UpdateBlogCategoryDto } from './dto/update-blog-category.dto';
+import { BlogCategoryFilterDto } from './dto/blog-category-filter.dto';
 
 /**
  * Service for managing blog categories.
@@ -26,25 +26,43 @@ export class BlogCategoriesService {
    * @returns {Promise<BlogCategory>} - The created blog category.
    */
   async create(createDto: CreateBlogCategoryDto): Promise<BlogCategory> {
-    return this.blogCategoryModel.create(createDto);
+    return this.blogCategoryModel.create({
+      ...createDto,
+      domain: new Types.ObjectId(createDto.domainId),
+    });
   }
 
   /**
-   * Retrieves all blog categories with pagination.
+   * Retrieves all blog categories with optional filters for domain url search.
    *
-   * @param {PaginationDto} pagination - The pagination parameters to control the results.
+   * @param {BlogFilterDto} filter - The DTO containing the filtering criteria.
    * @returns {Promise<{ data: BlogCategory[]; count: number }>} - An object containing the list of blog categories and the total count.
    */
   async findAll(
-    pagination: PaginationDto,
+    filter: BlogCategoryFilterDto,
   ): Promise<{ data: BlogCategory[]; count: number }> {
+    const conditions = {};
+
+    // Fetch domain ID based on domainUrl if provided
+    if (filter.domainUrl) {
+      const domain = await this.blogCategoryModel.db
+        .collection('domains')
+        .findOne({ url: filter.domainUrl });
+
+      if (domain) {
+        conditions['domain'] = new Types.ObjectId(domain._id);
+      } else {
+        return { data: [], count: 0 }; // No blog categories found for the given domain
+      }
+    }
     const [data, count] = await Promise.all([
       this.blogCategoryModel
-        .find()
-        .skip((pagination.pageIndex - 1) * pagination.pageSize)
-        .limit(pagination.pageSize)
+        .find(conditions)
+        .populate('domain', '-__v -createdAt -updatedAt -isActive')
+        .skip((filter.pageIndex - 1) * filter.pageSize)
+        .limit(filter.pageSize)
         .exec(),
-      this.blogCategoryModel.countDocuments().exec(),
+      this.blogCategoryModel.countDocuments(conditions).exec(),
     ]);
 
     return { data, count };

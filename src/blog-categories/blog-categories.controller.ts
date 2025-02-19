@@ -9,7 +9,12 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiTags, ApiBearerAuth, ApiOperation } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+} from '@nestjs/swagger';
 import { BlogCategoriesService } from './blog-categories.service';
 import { CreateBlogCategoryDto } from './dto/create-blog-category.dto';
 import { UpdateBlogCategoryDto } from './dto/update-blog-category.dto';
@@ -59,10 +64,12 @@ export class BlogCategoriesController {
   @Public()
   @Get()
   @ApiOperation({ summary: 'Get all blog categories' })
+  @ApiQuery({ name: 'domainUrl', required: false })
   findAll(
     @Query() pagination: PaginationDto,
+    @Query('domainUrl') domainUrl?: string,
   ): Promise<{ data: BlogCategory[]; count: number }> {
-    return this.service.findAll(pagination);
+    return this.service.findAll({ domainUrl, ...pagination });
   }
 
   /**
